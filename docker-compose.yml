@@ -4,9 +4,15 @@ services:
     working_dir: /srv/jekyll
 
     command: >
-      sh -c 'mkdir -p _data/themes assets/css &&
+      sh -c '
+      if [ -f /style-guide/assets/css/tokens.css ]; then
+      mkdir -p _data/themes assets/css &&
       cp /style-guide/_data/themes/*.yml _data/themes/ &&
       cp /style-guide/assets/css/tokens.css assets/css/tokens.css &&
+      echo "Style guide ingested from /style-guide";
+      else
+      echo "No style guide found (STYLE_DIR unset or wrong path), skipping ingest";
+      fi &&
       bundle install &&
       bundle exec jekyll serve --livereload --host 0.0.0.0 --destination /tmp/_site'
 
@@ -16,8 +22,9 @@ services:
 
     volumes:
       - ${SITE_DIR}:/srv/jekyll
-      - ${STYLE_DIR}:/style-guide:ro
+      - ${STYLE_DIR:-style_empty}:/style-guide:ro
       - jekyll_gems:/usr/gem
 
 volumes:
   jekyll_gems:
+  style_empty:
