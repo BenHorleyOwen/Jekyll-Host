@@ -1,12 +1,14 @@
-
 services:
   jekyll:
     image: jekyll/jekyll:latest
     working_dir: /srv/jekyll
 
     command: >
-      sh -c 'bundle install &&
-      bundle exec jekyll serve --livereload --host 0.0.0.0'
+      sh -c 'mkdir -p _data/themes assets/css &&
+      cp /style-guide/_data/themes/*.yml _data/themes/ &&
+      cp /style-guide/assets/css/tokens.css assets/css/tokens.css &&
+      bundle install &&
+      bundle exec jekyll serve --livereload --host 0.0.0.0 --destination /tmp/_site'
 
     ports:
       - "4000:4000"
@@ -14,6 +16,7 @@ services:
 
     volumes:
       - ${SITE_DIR}:/srv/jekyll
+      - ${STYLE_DIR}:/style-guide:ro
       - jekyll_gems:/usr/gem
 
 volumes:
